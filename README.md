@@ -12,7 +12,7 @@ $ git clone https://github.com/dzungtran/ali-dropship-proxy-api.git # or clone y
 $ cd ali-dropship-proxy-api
 $ npm install
 $ cp .env.example .env # may you need update `MONGODB_URI`
-$ npm start # or `heroky local`, If you used heroku already
+$ npm start # or `heroku local`, If you used heroku already
 ```
 
 Your app should now be running on [localhost:5000](http://localhost:5000/).
