@@ -3,6 +3,7 @@ const dateFormat = require('dateformat'),
 const axios = require('axios')
 const qs = require('querystring')
 
+// Fake ali order and status
 const makeAliOrders = async (placeOrder) => {
   try {
     let oList = await generateAliOrders(placeOrder)
@@ -162,13 +163,16 @@ const generateAliOrders = async (placeOrder) => {
   return orderList
 }
 
+// TODO: needs refactor DRY
 const getAliOrder = async (topClient, orderQuery, method, req) => {
   let o
   const oQ = JSON.parse(orderQuery)
   try {
     o = await db.Order.findOne({refId: oQ.order_id})
-    // try get product from ali
+    // If not found data from mongo, try get product from ali
     if (!o) {
+
+      // Make request to aliexpress api based on client params
       // const data = await topClient.execute(method, {
       //   format: 'json',
       //   timestamp: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
@@ -176,6 +180,8 @@ const getAliOrder = async (topClient, orderQuery, method, req) => {
       //   single_order_query: orderQuery,
       //   session: process.env.TEMP_TOKEN,
       // })
+
+      // Forward request from client to aliexpress api
       const res = await axios({
         url: '/rest',
         method: 'post',
@@ -199,8 +205,10 @@ const getAliOrder = async (topClient, orderQuery, method, req) => {
 
     } else {
       const dt = new Date()
+      
+      // Refresh data every 6 hours
+      // TODO: need move to global configs
       dt.setTime(dt.getTime() - (6 * 60 * 60 * 1000)) // 6 hours
-      // dt.setTime(dt.getTime() - (60*1000)) // 1 minute
       if (o.updatedAt < dt.getTime()) {
         await o.remove()
         const resU = await axios({
@@ -213,6 +221,7 @@ const getAliOrder = async (topClient, orderQuery, method, req) => {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         })
+
         if (resU.data.aliexpress_trade_ds_order_get_response.result) {
           o = new db.Order(resU.data.aliexpress_trade_ds_order_get_response.result)
           o.refId = oQ.order_id

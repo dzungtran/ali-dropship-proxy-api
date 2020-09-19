@@ -38,14 +38,16 @@ const topClient = new TopClient(process.env.APP_KEY, process.env.APP_SECRET, {
 
 // ==== Routers ====
 app.get('/', (req, res) => {
-  res.json({'message': 'Welcome to AliExpress Mock API.'})
+  res.json({'message': 'Welcome to AliExpress Proxy API.'})
 })
 
 app.post('/router/rest', async (req, res) => {
+  
   console.log('===================',
     '\nBODY:', req.body,
     '\nQUERY:', req.query,
     '\n===================')
+
   const method = req.query.method,
     pId = req.body.product_id,
     oQuery = req.body.single_order_query,

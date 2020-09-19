@@ -3,6 +3,7 @@ const dateFormat = require('dateformat'),
 const axios = require('axios')
 const qs = require('querystring')
 
+// TODO: needs refactor DRY
 const getAliProduct = async (topClient, pId, method, req) => {
   let p
   try {
@@ -40,8 +41,10 @@ const getAliProduct = async (topClient, pId, method, req) => {
     } else {
 
       const dt = new Date()
+
+      // Refresh data every 6 hours
+      // TODO: need move to global configs
       dt.setTime(dt.getTime() - (6 * 60 * 60 * 1000)) // 6 hours
-      // dt.setTime(dt.getTime() - (60*1000)) // 1 minute
       if (p.updatedAt < dt.getTime()) {
         await p.remove()
         const resU = await axios({
